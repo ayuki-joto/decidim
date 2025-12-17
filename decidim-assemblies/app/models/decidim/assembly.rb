@@ -57,6 +57,9 @@ module Decidim
                foreign_key: "decidim_assemblies_type_id",
                class_name: "Decidim::AssembliesType",
                optional: true
+
+    enum :access_mode, { open: 0, transparent: 1, restricted: 2 }, default: :open
+
     has_many :categories,
              foreign_key: "decidim_participatory_space_id",
              foreign_type: "decidim_participatory_space_type",
@@ -79,6 +82,7 @@ module Decidim
 
     after_create :set_parents_path
     after_update :set_parents_path, :update_children_paths, if: :saved_change_to_parent_id?
+    before_save :update_legacy_fields_for_access_mode, if: :saved_change_to_access_mode?
 
     searchable_fields({
                         scope_id: :decidim_scope_id,
@@ -94,7 +98,7 @@ module Decidim
 
     # Overwriting existing method Decidim::ParticipatorySpace::HasMembers.public_spaces
     def self.public_spaces
-      where(private_space: false).or(where(private_space: true).where(is_transparent: true)).published
+      where(access_mode: [:open, :transparent]).published
     end
 
     # Scope to return only the promoted assemblies.
@@ -120,7 +124,16 @@ module Decidim
 
     # This is a overwrite for Decidim::ParticipatorySpaceResourceable.visible?
     def visible?
-      published? && (!private_space? || (private_space? && is_transparent?))
+      published? && open?
+    end
+
+    # Backward compatibility methods for private_space and is_transparent
+    def private_space?
+      restricted?
+    end
+
+    def is_transparent?
+      transparent? || open?
     end
 
     def to_param
@@ -229,5 +242,13 @@ module Decidim
 
     # Allow ransacker to search for a key in a hstore column (`title`.`en`)
     ransacker_i18n :title
+
+    private
+
+    # Update legacy fields for backward compatibility when access_mode changes
+    def update_legacy_fields_for_access_mode
+      self.private_space = access_mode_restricted?
+      self.is_transparent = access_mode_transparent? || access_mode_open?
+    end
   end
 end

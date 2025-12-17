@@ -46,6 +46,7 @@ module Decidim
         attribute :weight, Integer, default: 0
 
         attribute :has_members, Boolean
+        attribute :access_mode, String
         attribute :is_transparent, Boolean
         attribute :promoted, Boolean
         attribute :private_space, Boolean
@@ -74,8 +75,20 @@ module Decidim
         validates :hero_image, passthru: { to: Decidim::Assembly }
 
         validates :weight, presence: true
+        validates :access_mode, inclusion: { in: %w(open transparent restricted) }, allow_blank: true
+
+        validate :force_open_access_mode_without_members
 
         alias organization current_organization
+
+        # Backward compatibility methods
+        def private_space
+          access_mode == "restricted"
+        end
+
+        def is_transparent
+          access_mode.in?(%w(open transparent))
+        end
 
         def participatory_space_manifest
           :assemblies
@@ -108,6 +121,12 @@ module Decidim
         end
 
         private
+
+        def force_open_access_mode_without_members
+          return if has_members?
+
+          self.access_mode = "open" if access_mode != "open"
+        end
 
         def organization_participatory_processes
           Decidim.find_participatory_space_manifest(:participatory_processes)

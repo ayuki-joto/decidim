@@ -188,17 +188,33 @@
 
     <div id="panel-access" class="card-section">
       <div class="row column" id="has_members">
-        <%= form.check_box :has_members, help_text: t(".has_members_help") %>
+        <%= form.check_box :has_members, 
+                           help_text: t(".has_members_help"),
+                           data: { 
+                             controller: "toggle", 
+                             toggle_toggle_value: "access_mode_options" 
+                           } %>
       </div>
 
-      <div class="row column" id="private_space">
-        <%= form.check_box :private_space %>
-        <p class="help-text"><%= t(".private_notice") %></p>
+      <div class="row column" id="access_mode_options" <%= 'hidden' unless form.object.has_members %>>
+        <%= form.collection_radio_buttons :access_mode,
+          [
+            [t("access_modes.open", scope: "decidim.assemblies.admin.assemblies.form"), "open"],
+            [t("access_modes.transparent", scope: "decidim.assemblies.admin.assemblies.form"), "transparent"],
+            [t("access_modes.restricted", scope: "decidim.assemblies.admin.assemblies.form"), "restricted"]
+          ],
+          :last, :first do |b| %>
+          <div class="radio-button">
+            <%= b.radio_button %>
+            <%= b.label(class: "radio-button-label") %>
+          </div>
+        <% end %>
+        
       </div>
 
-      <div class="row column" id="is_transparent">
-        <%= form.check_box :is_transparent %>
-      </div>
+      <!-- Keep hidden fields for backward compatibility -->
+      <%= form.hidden_field :private_space %>
+      <%= form.hidden_field :is_transparent %>
     </div>
   </div>
 

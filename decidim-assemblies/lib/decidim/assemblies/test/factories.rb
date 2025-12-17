@@ -38,6 +38,7 @@ FactoryBot.define do
     participatory_structure { generate_localized_title(:assembly_participatory_structure, skip_injection:) }
     private_space { false }
     has_members { false }
+    access_mode { "open" }
     purpose_of_action { generate_localized_description(:assembly_purpose_of_action, skip_injection:) }
     composition { generate_localized_description(:assembly_composition, skip_injection:) }
     creation_date { 1.month.ago }
@@ -80,17 +81,42 @@ FactoryBot.define do
 
     trait :public do
       private_space { false }
+      access_mode { "open" }
     end
 
     trait :private do
       private_space { true }
+      access_mode { "restricted" }
     end
 
     trait :transparent do
       is_transparent { true }
+      access_mode { "transparent" }
     end
 
     trait :opaque do
+      is_transparent { false }
+    end
+
+    trait :with_members do
+      has_members { true }
+    end
+
+    trait :open_access do
+      access_mode { "open" }
+      private_space { false }
+      is_transparent { true }
+    end
+
+    trait :transparent_access do
+      access_mode { "transparent" }
+      private_space { true }
+      is_transparent { true }
+    end
+
+    trait :restricted_access do
+      access_mode { "restricted" }
+      private_space { true }
       is_transparent { false }
     end
 

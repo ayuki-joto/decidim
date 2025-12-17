@@ -15,6 +15,9 @@ module Decidim
               files: serialize_attachments
             },
             private_space: resource.private_space,
+            is_transparent: resource.is_transparent,
+            access_mode: resource.access_mode,
+            has_members: resource.has_members?,
             weight: resource.weight,
             components: serialize_components
           }

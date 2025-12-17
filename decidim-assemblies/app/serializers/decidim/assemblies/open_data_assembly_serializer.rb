@@ -50,7 +50,9 @@ module Decidim
             assembly_type: {
               id: resource.assembly_type.try(:id),
               title: resource.assembly_type.try(:title) || empty_translatable
-            }
+            },
+            access_mode: resource.access_mode,
+            has_members: resource.has_members?
           }
         )
       end

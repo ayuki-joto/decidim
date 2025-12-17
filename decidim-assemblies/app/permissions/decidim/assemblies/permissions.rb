@@ -117,7 +117,8 @@ module Decidim
       end
 
       def can_view_private_space?
-        return true unless assembly.private_space && !assembly.is_transparent?
+        return true if assembly.open?
+        return true if assembly.transparent?
         return false unless user
 
         user.admin || assembly.users.include?(user)
