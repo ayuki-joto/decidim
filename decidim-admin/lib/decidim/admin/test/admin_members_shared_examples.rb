@@ -3,7 +3,7 @@
 shared_examples "manage admin members examples" do
   let(:other_user) { create(:user, organization:, email: "my_email@example.org") }
 
-  let!(:member) { create(:member, user:, participatory_space: participatory_space) }
+  let!(:member) { create(:member, user:, participatory_space:) }
 
   before do
     switch_to_host(organization.host)
@@ -55,7 +55,7 @@ shared_examples "manage admin members examples" do
   end
 
   describe "when publishing all members" do
-    let!(:member) { create(:member, :unpublished, user:, privatable_to: participatory_process) }
+    let!(:member) { create(:member, :unpublished, user:, participatory_space:) }
 
     it "publishes all members" do
       click_on "Publish all"
@@ -68,13 +68,13 @@ shared_examples "manage admin members examples" do
       click_on "Publish all"
       sleep(1)
       visit decidim_admin.root_path
-      expect(page).to have_content("published all members of the #{translated(participatory_process.title)} participatory process")
+      expect(page).to have_content("published all members of the #{translated(participatory_space.title)}")
     end
   end
 
   describe "when managing different users" do
     before do
-      create(:member, user: other_user, participatory_space: participatory_space)
+      create(:member, user: other_user, participatory_space:)
       visit current_path
     end
 

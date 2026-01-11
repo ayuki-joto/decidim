@@ -47,6 +47,7 @@ module Decidim
 
         attribute :has_members, Boolean
         attribute :access_mode, String
+
         attribute :is_transparent, Boolean
         attribute :promoted, Boolean
         attribute :private_space, Boolean
